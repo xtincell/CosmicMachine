@@ -1,0 +1,6 @@
+.env
+node_modules/
+concept-engine/outputs/*.json
+concept-engine/outputs/*.md
+outputs/
+*.DS_Store
