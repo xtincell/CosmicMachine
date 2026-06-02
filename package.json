@@ -4,13 +4,15 @@
   "description": "Studio de production publicitaire augmenté par l'IA",
   "type": "module",
   "scripts": {
+    "start": "node server.js",
     "concept": "node concept-engine/generate.js",
     "concept:batch": "node concept-engine/batch.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.55.0",
-    "dotenv": "^16.4.5",
     "chalk": "^5.3.0",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1",
     "inquirer": "^9.2.23"
   }
 }

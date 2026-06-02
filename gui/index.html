@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COSMICMACHINE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="logo">
+        <span class="logo-icon">✦</span>
+        <span class="logo-text">COSMICMACHINE</span>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-panel="brief">Brief</button>
+        <button class="nav-btn" data-panel="refine">Affiner</button>
+        <button class="nav-btn" data-panel="variations">Variations</button>
+      </nav>
+      <div class="status" id="status">
+        <span class="status-dot"></span>
+        <span class="status-text">Prêt</span>
+      </div>
+    </header>
+
+    <!-- BODY: FORM + OUTPUT -->
+    <div class="body">
+
+      <!-- FORM COLUMN -->
+      <div class="form-col">
+
+        <!-- BRIEF PANEL -->
+        <section class="panel active" id="panel-brief">
+          <h2 class="panel-title">Nouveau Brief</h2>
+          <p class="panel-sub">Décris ta campagne. COSMICMACHINE génère les concepts.</p>
+          <form class="form" id="form-brief">
+            <div class="field">
+              <label>Produit / Service <span class="req">*</span></label>
+              <input type="text" id="product" placeholder="ex: Nike Air Max 2025" required>
+            </div>
+            <div class="field">
+              <label>Cible <span class="req">*</span></label>
+              <input type="text" id="target" placeholder="ex: Hommes 18–35, urbains, passionnés de sport" required>
+            </div>
+            <div class="field">
+              <label>Message clé <span class="req">*</span></label>
+              <textarea id="message" rows="2" placeholder="ex: La nouvelle Air Max repousse les limites du confort urbain" required></textarea>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label>Ton</label>
+                <input type="text" id="tone" placeholder="ex: Premium, audacieux">
+              </div>
+              <div class="field">
+                <label>Formats cibles</label>
+                <input type="text" id="formats" placeholder="ex: Reels, OOH">
+              </div>
+            </div>
+            <div class="field">
+              <label>Contraintes</label>
+              <input type="text" id="constraints" placeholder="ex: Pas de comparaison concurrentielle">
+            </div>
+            <div class="field">
+              <label>Nombre de concepts</label>
+              <div class="number-control">
+                <button type="button" class="nb-btn" id="nb-minus">−</button>
+                <span id="nb-display">3</span>
+                <button type="button" class="nb-btn" id="nb-plus">+</button>
+              </div>
+            </div>
+            <button type="submit" class="btn-generate" id="btn-generate">
+              <span class="btn-icon">⚡</span>
+              Générer les concepts
+            </button>
+          </form>
+        </section>
+
+        <!-- REFINE PANEL -->
+        <section class="panel" id="panel-refine">
+          <h2 class="panel-title">Affiner un concept</h2>
+          <p class="panel-sub">Colle un concept et donne ton feedback créatif.</p>
+          <form class="form" id="form-refine">
+            <div class="field">
+              <label>Concept à affiner</label>
+              <textarea id="refine-concept" rows="7" placeholder="Colle ici le concept à améliorer..."></textarea>
+            </div>
+            <div class="field">
+              <label>Feedback / Direction <span class="req">*</span></label>
+              <textarea id="refine-feedback" rows="3" placeholder="ex: Rends-le plus émotionnel, insiste sur la liberté." required></textarea>
+            </div>
+            <div class="field">
+              <label>Produit</label>
+              <input type="text" id="refine-product" placeholder="Nom du produit">
+            </div>
+            <button type="submit" class="btn-generate">
+              <span class="btn-icon">✦</span>Affiner
+            </button>
+          </form>
+        </section>
+
+        <!-- VARIATIONS PANEL -->
+        <section class="panel" id="panel-variations">
+          <h2 class="panel-title">Générer des variations</h2>
+          <p class="panel-sub">Décline un concept sur plusieurs tons ou formats.</p>
+          <form class="form" id="form-variations">
+            <div class="field">
+              <label>Concept source</label>
+              <textarea id="var-concept" rows="7" placeholder="Colle ici le concept à décliner..."></textarea>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label>Variations</label>
+                <div class="number-control">
+                  <button type="button" class="nb-btn" id="var-nb-minus">−</button>
+                  <span id="var-nb-display">3</span>
+                  <button type="button" class="nb-btn" id="var-nb-plus">+</button>
+                </div>
+              </div>
+              <div class="field">
+                <label>Produit</label>
+                <input type="text" id="var-product" placeholder="Nom du produit">
+              </div>
+            </div>
+            <button type="submit" class="btn-generate">
+              <span class="btn-icon">◈</span>Décliner
+            </button>
+          </form>
+        </section>
+
+      </div><!-- /form-col -->
+
+      <!-- OUTPUT COLUMN -->
+      <div class="output-col">
+        <div class="output-header">
+          <span class="output-title" id="output-title">Résultats</span>
+          <div class="output-actions">
+            <button class="icon-btn" id="btn-copy" title="Copier">⊕</button>
+            <button class="icon-btn" id="btn-clear" title="Effacer">✕</button>
+          </div>
+        </div>
+        <div class="output-content" id="output">
+          <div class="output-placeholder">
+            <div class="placeholder-icon">✦</div>
+            <p>Tes concepts apparaîtront ici en temps réel.</p>
+          </div>
+        </div>
+        <div class="output-footer" id="output-footer" style="display:none">
+          <span class="saved-path" id="saved-path"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
