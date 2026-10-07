@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "concept": "node concept-engine/generate.js",
-    "concept:batch": "node concept-engine/batch.js"
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check server.js && node --check concept-engine/generate.js && node --check concept-engine/output.js && node --check concept-engine/prompts/concept.js && node --check gui/app.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.55.0",

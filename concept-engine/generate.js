@@ -1,32 +1,28 @@
 #!/usr/bin/env node
 import Anthropic from '@anthropic-ai/sdk';
 import { createInterface } from 'readline';
-import { writeFileSync, mkdirSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 import 'dotenv/config';
+import { saveOutput as saveFile } from './output.js';
 import { buildConceptPrompt, buildRefinementPrompt, buildVariationsPrompt } from './prompts/concept.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let client;
 
 const rl = createInterface({ input: process.stdin, output: process.stdout });
 const ask = (q) => new Promise(r => rl.question(q, r));
 
-function saveOutput(brief, content) {
-  const dir = join(__dirname, 'outputs');
-  mkdirSync(dir, { recursive: true });
-  const ts = new Date().toISOString().slice(0, 16).replace(':', 'h');
-  const slug = brief.product.toLowerCase().replace(/\s+/g, '-').slice(0, 20);
-  const file = join(dir, `${ts}_${slug}.md`);
-  const header = `# Concepts — ${brief.product}\n_Généré le ${new Date().toLocaleDateString('fr-FR')}_\n\n---\n\n`;
-  writeFileSync(file, header + content);
-  return file;
+function saveOutput(brief, content, { kind = 'concepts', selectedConcept } = {}) {
+  const suffix = kind === 'concepts' ? '' : `-${kind}`;
+  const selection = selectedConcept ? `Concept source : ${selectedConcept}\n\n` : '';
+  const header = `# Concepts — ${brief.product}\n_Généré le ${new Date().toLocaleDateString('fr-FR')}_\n\n`
+    + `## Brief d'origine\n\n\`\`\`json\n${JSON.stringify(brief, null, 2)}\n\`\`\`\n\n`
+    + selection + '---\n\n';
+  return saveFile(brief.product + suffix, header + content);
 }
 
 async function streamConcept(prompt) {
   process.stdout.write('\n');
   let full = '';
+  client ??= new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const stream = await client.messages.stream({
     model: 'claude-opus-4-8',
     max_tokens: 4096,
@@ -64,6 +60,15 @@ async function collectBrief() {
 }
 
 async function postActions(concepts, brief) {
+  const choose = (number) => {
+    if (!/^[1-9]\d*$/.test(number.trim())) return null;
+    const headings = [...concepts.matchAll(/^##\s+CONCEPT\s+\[?(\d+)\]?\s*[—–:-].*$/gmi)];
+    const matches = headings.map((h, index) => ({ h, index }))
+      .filter(({ h }) => Number(h[1]) === Number(number));
+    if (matches.length !== 1) return null;
+    const { h, index } = matches[0];
+    return concepts.slice(h.index, headings[index + 1]?.index ?? concepts.length).trim();
+  };
   while (true) {
     console.log('\n──────────────────────────────────────');
     console.log('Que faire ensuite ?');
@@ -77,15 +82,19 @@ async function postActions(concepts, brief) {
 
     if (choice === '1') {
       const num = await ask('Numéro du concept à affiner : ');
+      const concept = choose(num);
+      if (!concept) { console.error('Concept introuvable ou numéro ambigu : reprends un numéro présent dans le résultat.'); continue; }
       const feedback = await ask('Feedback / direction : ');
-      const refined = await streamConcept(buildRefinementPrompt(`Concept ${num} du brief précédent`, feedback));
-      saveOutput({ product: `${brief.product}-refined` }, refined);
+      const refined = await streamConcept(buildRefinementPrompt(concept, feedback, brief));
+      saveOutput(brief, refined, { kind: 'refined', selectedConcept: num });
 
     } else if (choice === '2') {
       const num = await ask('Numéro du concept à décliner : ');
+      const concept = choose(num);
+      if (!concept) { console.error('Concept introuvable ou numéro ambigu : reprends un numéro présent dans le résultat.'); continue; }
       const nb = await ask('Nombre de variations [3] : ');
-      const vars = await streamConcept(buildVariationsPrompt(`Concept ${num} du brief précédent`, parseInt(nb) || 3));
-      saveOutput({ product: `${brief.product}-variations` }, vars);
+      const vars = await streamConcept(buildVariationsPrompt(concept, parseInt(nb) || 3, brief));
+      saveOutput(brief, vars, { kind: 'variations', selectedConcept: num });
 
     } else if (choice === '3') {
       break;

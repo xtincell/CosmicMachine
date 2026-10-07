@@ -57,22 +57,22 @@ Sépare chaque concept par une ligne de tirets (---).
 Sois audacieux, original, mémorable. Évite les clichés publicitaires éculés.`;
 }
 
-export function buildRefinementPrompt(concept, feedback) {
+export function buildRefinementPrompt(concept, feedback, brief) {
   return `Voici un concept publicitaire existant :
 
 ${concept}
-
+${brief ? `\nBrief d'origine à respecter :\n${JSON.stringify(brief, null, 2)}\n` : ''}
 Retravaille-le en tenant compte de ce feedback :
 ${feedback}
 
 Conserve la même structure de sortie. Améliore ce qui est demandé sans tout changer.`;
 }
 
-export function buildVariationsPrompt(concept, nbVariations = 3) {
+export function buildVariationsPrompt(concept, nbVariations = 3, brief) {
   return `À partir de ce concept publicitaire :
 
 ${concept}
-
+${brief ? `\nBrief d'origine à respecter :\n${JSON.stringify(brief, null, 2)}\n` : ''}
 Génère ${nbVariations} variations créatives qui conservent la Big Idea mais explorent :
 - Des tons différents (humour, émotion, provocation...)
 - Des cibles secondaires
