@@ -1,144 +1,68 @@
-# COSMICMACHINE — Capacités & Modes d'emploi
+# COSMICMACHINE — concepts, affinage et variations
 
-> **Règle d'or :** Higgsfield consomme des tokens. Ne jamais déclencher sans autorisation explicite d'Alexandre.
+Le produit implémenté transforme un brief en pistes argumentées, puis permet
+leur affinage ou leurs variations. Il prépare un arbitrage humain ; il ne
+reçoit ni l'accord client, ni la production de médias, ni leur livraison.
 
----
+## Utilisation actuelle
 
-## Vue d'ensemble
+Node.js 22 est la cible de vérification. Installer avec `npm ci`, copier
+`.env.example` en `.env` et renseigner l'accès fournisseur uniquement pour une
+génération voulue. `npm start` ouvre l'interface locale sur le port 3000.
+`npm run concept` lance le questionnaire interactif en terminal. Le programme
+ne possède ni argument `--brief`, ni script batch implémenté.
 
-COSMICMACHINE est un studio de production publicitaire augmenté par l'IA. Il couvre la chaîne complète : **brief → concept → copy → visuel → production**.
+Chaque piste demande insight, big idea, headline, claim, body copy, direction
+artistique, formats et variante A/B. Le résultat texte reste une proposition à
+juger ; la précision du prompt ne prouve pas sa valeur créative ou stratégique.
 
----
+Après génération en terminal, choisir le numéro présent dans les titres
+`## CONCEPT N — NOM` ou `## CONCEPT [N] — NOM`. L'affinage transmet le contenu
+réel de cette piste, le retour et le brief d'origine. Les variations transmettent
+également la piste et ce brief. Numéro absent ou ambigu : aucune requête ne part.
+Les fichiers CLI conservent le brief et la sélection source dans leur Markdown.
 
-## 1. CONCEPT ENGINE *(disponible maintenant)*
+Les fichiers de `concept-engine/outputs/` sont créés avec une identité propre,
+un nom de produit sans séparateur de chemin et une ouverture exclusive.
+L'écrivain partagé HTTP/CLI ne remplace pas un résultat existant. Le contenu est
+écrit et synchronisé avant de retourner son chemin. Une sauvegarde échouée ne
+produit aucun reçu de succès ; les fichiers historiques ne sont pas renommés.
+Cela ne reçoit pas une sauvegarde externe ou une restauration après sinistre.
 
-**Ce que ça fait :** À partir d'un brief (produit, cible, message, ton), génère plusieurs angles créatifs complets.
+## Interface HTTP existante
 
-**Chaque concept inclut :**
-- Titre de campagne + claim
-- Insight consommateur
-- Idée créative centrale (Big Idea)
-- Copy headline + body
-- Direction artistique décrite (couleurs, typographie, ambiance)
-- Suggestions de formats (social, affichage, vidéo)
-- Variantes A/B
+- `/api/generate` reçoit le brief.
+- `/api/refine` reçoit le texte du concept et le retour.
+- `/api/variations` reçoit le texte du concept et le nombre de variantes.
 
-**Commande :**
-```bash
-node concept-engine/generate.js --brief "votre brief"
-# ou mode interactif
-node concept-engine/generate.js
-```
+Les trois routes émettent le texte en SSE, puis le reçu de fichier après écriture.
+En cas d'échec fournisseur ou de sauvegarde, elles émettent une erreur sans
+complétion. Un fragment transporté n'est pas un dossier partiel restaurable.
+`createApp` permet de recevoir ces routes avec des fournisseurs de recette ;
+le lancement normal garde l'accès configuré. Aucun appel payant n'est exécuté
+par les tests.
 
----
+## Capacités documentées mais absentes du dépôt
 
-## 2. HIGGSFIELD — Génération Vidéo *(autorisation requise)*
+Vidéo Higgsfield, Product Photoshoot, Marketplace Cards et Soul ID étaient
+présentés comme des wrappers exécutables. Les quatre programmes ne sont pas
+présents. Une compétence installée ailleurs ne crée pas ces commandes ici.
+Leur raccord éventuel doit réutiliser la fabrication gouvernée existante,
+avec autorisation explicite avant tout appel consommant des tokens Higgsfield.
+Aucun wrapper supplémentaire n'est créé pour rendre cette ancienne prose vraie.
 
-**Ce que ça fait :** Transforme un concept ou une image en vidéo publicitaire IA.
+## Vérifications et maturité encore ouverte
 
-**Modes disponibles :**
-| Mode | Usage | Coût estimé |
-|------|-------|-------------|
-| `text-to-video` | Brief texte → vidéo | ●●●○○ |
-| `image-to-video` | Photo produit → vidéo animée | ●●○○○ |
-| `UGC ads` | Contenu style utilisateur | ●●●○○ |
+`npm run check` contrôle la syntaxe ; `npm test` reçoit conservation de sorties
+au même instant, processus concurrents, chemins, sélection et contexte réels,
+ainsi que les trois routes HTTP sur réseau local avec fournisseur simulé.
+Les tests reproduisent l'écrasement et le concept de substitution avant correction.
 
-**Commande (après autorisation) :**
-```bash
-node higgsfield/video.js --concept "concept-001"
-```
+Ces contrôles ne reçoivent pas une génération vivante ni une UX native. Le modèle
+est fixé dans le code et sa disponibilité n'est pas reçue. Authentification,
+autorisation, quotas et budgets ne sont pas qualifiés pour une exposition
+partagée. Relecture des sorties, reprise dans l'interface, interruption du flux,
+statut partiel, import et remise au dossier destinataire restent ouverts.
+Ne pas exposer ce prototype comme un service TPE reçu sur la seule base de ces tests.
 
----
-
-## 3. HIGGSFIELD — Product Photoshoot *(autorisation requise)*
-
-**Ce que ça fait :** Génère des photos produit professionnelles à partir d'une image source.
-
-**Cas d'usage :**
-- Packshots sur fond neutre ou lifestyle
-- Déclinaisons de contextes (cuisine, sport, luxe...)
-- Variantes coloris/ambiances
-
-**Commande (après autorisation) :**
-```bash
-node higgsfield/photoshoot.js --product ./assets/produit.jpg
-```
-
----
-
-## 4. HIGGSFIELD — Marketplace Cards *(autorisation requise)*
-
-**Ce que ça fait :** Crée les visuels complets d'une fiche produit e-commerce (Amazon, Shopify, Cdiscount...).
-
-**Ce qui est généré :**
-- Image principale conforme marketplace
-- 4–6 images secondaires (bénéfices, détails, contexte)
-- Modules A+ / contenu enrichi
-- Infographies produit
-
-**Commande (après autorisation) :**
-```bash
-node higgsfield/marketplace.js --product-name "Nom" --category "Catégorie"
-```
-
----
-
-## 5. HIGGSFIELD — Soul ID / Character Training *(autorisation requise)*
-
-**Ce que ça fait :** Entraîne un personnage IA (égérie, mascotte, spokesperson) pour cohérence visuelle sur toutes les campagnes.
-
-**Cas d'usage :**
-- Égérie de marque reproductible
-- Personnage récurrent sur une série de pubs
-- Porte-parole virtuel
-
-**Commande (après autorisation) :**
-```bash
-node higgsfield/soul-id.js --character-name "Nom" --reference ./assets/ref.jpg
-```
-
----
-
-## Pipeline type d'une campagne complète
-
-```
-Brief
-  └─▶ [1] Concept Engine     → angles créatifs + copy
-         └─▶ [3] Photoshoot  → visuel produit
-               └─▶ [2] Video → spot animé
-                     └─▶ [4] Marketplace Cards → fiche e-commerce
-```
-
----
-
-## Structure du projet
-
-```
-COSMICMACHINE/
-├── concept-engine/       ← Machine à concepts (Claude AI)
-│   ├── generate.js
-│   ├── prompts/
-│   └── outputs/
-├── higgsfield/           ← Wrappers Higgsfield (autorisation requise)
-│   ├── video.js
-│   ├── photoshoot.js
-│   ├── marketplace.js
-│   └── soul-id.js
-├── assets/               ← Fichiers source (images, briefs)
-├── outputs/              ← Résultats générés
-└── COSMICMACHINE.md      ← Ce fichier
-```
-
----
-
-## Variables d'environnement requises
-
-```bash
-# .env
-ANTHROPIC_API_KEY=sk-ant-...    # Pour Concept Engine
-HIGGSFIELD_API_KEY=...          # Pour modules Higgsfield (optionnel)
-```
-
----
-
-*COSMICMACHINE — by Xtincell*
+COSMICMACHINE — by Xtincell
